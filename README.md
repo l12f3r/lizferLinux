@@ -30,3 +30,23 @@ At this point, my newly-created user had administrative privileges whenever it u
 ### 1.c: Firewall
 
 Although this was a simple demonstration, it's always good practice to have a firewall set, to avoid undesired connections. Since that this is an Ubuntu machine, I used UFW. To enable it, I just had to enter `ufw enable`. As other software are installed, description on firewall settings will be added.
+
+## 2. Apache2 configuration
+
+Configuring the "A" in LAMP was a handful of work. From this moment onwards, I decided to authenticate using the PID 1000 account (lizfer) for testing reasons - hence why lots of `sudo` will appear. 
+
+### 2.a: Downloading
+
+The first step was getting Apache2 from Ubuntu's repos using `sudo apt install apache2`. Just had to accept the installation terms.
+
+### 2.b: Firewall settings
+
+By downloading Apache, UFW automatically creates profiles for Apache based on ports available for access. By entering `sudo ufw app list`, the list of available applications was prompted on the stdout (tl;dr: **Apache** profile opens only port 80, **Apache Full** opens both port 80 and port 443 and **Apache Secure** opens only port 443):
+
+    Available applications:
+      Apache
+      Apache Full
+      Apache Secure
+      OpenSSH
+
+As there was no TLS/SSL certificate configured, I allowed communication in port 80 only by enabling the **Apache** profile: `sudo ufw allow in "Apache"`.
