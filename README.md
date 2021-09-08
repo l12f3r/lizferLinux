@@ -5,6 +5,7 @@ I decided to create a personal space where I could demonstrate my Linux system a
 - This space needs to be operational anytime, anywhere (availability); and
 - it must meet minimal performance standards (reliability).
 
+
 ## 1. Linux machine
 
 ### 1.a: Provisioning the cloud machine
@@ -31,6 +32,7 @@ At this point, my newly-created user had administrative privileges whenever it u
 
 Although this was a simple demonstration, it's always good practice to have a firewall set, to avoid undesired connections. Since that this is an Ubuntu machine, I used UFW. To enable it, I just had to enter `ufw enable`. As other software are installed, description on firewall settings will be added.
 
+
 ## 2. Apache2 configuration
 
 Configuring the "A" in LAMP was a handful of work. From this moment onwards, I decided to authenticate using the PID 1000 account (lizfer) for testing reasons - hence why lots of `sudo` will appear. 
@@ -50,3 +52,16 @@ By downloading Apache, UFW automatically creates profiles for Apache based on po
       OpenSSH
 
 As there was no TLS/SSL certificate configured, I allowed communication in port 80 only by enabling the **Apache** profile: `sudo ufw allow in "Apache"`.
+
+
+## 3. MySQL configuration
+
+It might look scary at first, but setting up a database was not that difficult due to Ubuntu's configuration.
+
+Just had to use `sudo apt install mysql-server` to start downloading. Once completed, I ran `sudo mysql_secure_installation` to configure it using MySQL's security script:
+- For the `VALIDATE PASSWORD PLUGIN`, I set a MySQL root password with `STRONG` length (security should always be strong, IMHO);
+- Disabled root account access from a remote client (outside of the local host);
+- Removed anonymous user pre-set accounts;
+- Removed the test database, and privileges that allow access to databases with names starting with "test_". 
+
+Setting up a MySQL root password was extremely cautious, since that the default authentication method for root is using a unix_socket. 
