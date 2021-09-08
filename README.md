@@ -35,7 +35,9 @@ Although this was a simple demonstration, it's always good practice to have a fi
 
 ## 2. Apache2 configuration
 
-Configuring the "A" in LAMP was a handful of work. From this moment onwards, I decided to authenticate using the PID 1000 account (lizfer) for testing reasons - hence why lots of `sudo` will appear. 
+From this moment onwards, I decided to authenticate using the PID 1000 account (lizfer) for testing reasons - hence why lots of `sudo` will appear.
+
+Configuring the "A" in LAMP was a handful of work - my first attempt was configuring a Nginx web server, but conflicts with php-fpm and cacheing prevented me from doing so. 
 
 ### 2.a: Downloading
 
@@ -65,3 +67,8 @@ Just had to use `sudo apt install mysql-server` to start downloading. Once compl
 - Removed the test database, and privileges that allow access to databases with names starting with "test_". 
 
 Setting up a MySQL root password was extremely cautious, since that the default authentication method for root is using a unix_socket. 
+
+
+## 4. PHP configuration
+
+PHP installation by itself is not enough: I also installed `php-mysql` (module that allows PHP to communicate with MySQL) and `libapache2-mod-php` (to enable Apache to handle PHP files). Just entered `sudo apt install php php-mysql libapache2-mod-php`.
