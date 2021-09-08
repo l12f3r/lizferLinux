@@ -105,5 +105,5 @@ I had some exposure to front-end development in the past, which allowed me creat
 
 
 ## Thanks
-- [Digital Ocean](https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu-20-04), for great documentation where I learned from and hosting my website
-- [@groovemonkey (Dave Cohen)](https://github.com/groovemonkey) for his awesome [Udemy course](https://www.udemy.com/share/101Kb63@HcZhn7EZt1DD74Bm9iS3QcfMfMpwo27nepAzAPgEOdA2rfJqDb5HNVY3Xmk8BSuo/) and other content on [https://www.youtube.com/c/tutoriaLinux](YouTube)
+- [Digital Ocean](https://www.digitalocean.com/), for great documentation where I learned from and hosting my website
+- [@groovemonkey (Dave Cohen)](https://github.com/groovemonkey) for his awesome [Udemy course](https://www.udemy.com/share/101Kb63@HcZhn7EZt1DD74Bm9iS3QcfMfMpwo27nepAzAPgEOdA2rfJqDb5HNVY3Xmk8BSuo/) and other content on [Youtube](https://www.youtube.com/c/tutoriaLinux)
