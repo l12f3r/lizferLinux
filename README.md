@@ -1,5 +1,5 @@
 # lizferLinux
-Provisioning of a website implementation on cloud based on a server with LAMP (Linux, Apache2, MySQL and PHP). Check it at http://188.166.90.196.
+Provisioning of a Wordpress website implementation on cloud based on a server with LAMP (Linux 🐧, Apache2 🖌️, MySQL 🐬 and PHP 🐘). Check it at http://188.166.90.196 / http://lizfer.com.
 
 I decided to create a personal space where I could demonstrate my Linux system administration skills. The prerrogative was:
 - This space needs to be operational anytime, anywhere (availability); and
@@ -53,7 +53,7 @@ By downloading Apache, UFW automatically creates profiles for Apache based on po
       Apache Secure
       OpenSSH
 
-As there was no TLS/SSL certificate configured, I allowed communication in port 80 only by enabling the **Apache** profile: `sudo ufw allow in "Apache"`.
+To configure the TLS/SSL certificate for Wordpress, I allowed communication in ports 80 and 443 by enabling the **Apache Full** profile: `sudo ufw allow in "Apache Full"`.
 
 
 ## 3. MySQL
@@ -76,32 +76,51 @@ PHP installation by itself is not enough: I also installed `php-mysql` (module t
 At this point, the LAMP stack was already installed and I had a production instance working.
 
 
-## 5. Configuration
+## 5. Pre-Wordpress Configuration
 
-From this step onwards, all information can be reused upon provisioning new domains within the same host.
+This chapter is reserved for configuration that must be applied before installing Wordpress.
 
-### 5.1 Host configuration
+### 5.a: Apache's Virtual Host configuration
 
-I decided to use this machine for hosting more than one domain. Therefore, the configuration of an Apache virtual host was necessary. Data is displayed as `lizferLinux` but this is a placeholder - upon provisioning a new domain for this machine, the proper data must be used.
+*I decided to use this machine for hosting more than one domain. Therefore, the configuration of an Apache Virtual Host was necessary. Data is displayed as `lizfer` but this is a placeholder - upon provisioning a new domain for this machine, the proper data must be used.*
 
-The default `/var/www/html` directory remained as backup for the original files; I created a new folder under `www` (`sudo mkdir /var/www/lizferLinux`) and assigned its ownership to the PID 1000 user (`sudo chown -R $USER:$USER /var/www/lizferLinux`).
+The default `/var/www/html` directory remained as backup for the original files; I created a new folder under `www` (`sudo mkdir /var/www/lizfer`) and assigned its ownership to the PID 1000 user (`sudo chown -R $USER:$USER /var/www/lizfer`).
 
 Then, I created a new configuration file under Apache structure using Nano: `sudo nano /etc/apache2/sites-available/lizfer.conf` and included the following content in it:
-```yaml
+```
 <VirtualHost *:80>
-    ServerName lizferlinux
-    ServerAlias www.lizferlinux
+    ServerName lizfer
+    ServerAlias www.lizfer
     ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/lizferLinux
+    DocumentRoot /var/www/lizfer
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
-I used `sudo a2ensite lizferlinux` to instruct Apache which is the current active server, and disabled the default website using `sudo a2dissite 000-default`. Ran the final configuration test with `sudo apache2ctl configtest` and rebooted the instance.
+I used `sudo a2ensite lizfer` to instruct Apache which is the current active server, and disabled the default website using `sudo a2dissite 000-default`. Ran the final configuration test with `sudo apache2ctl configtest` (with a `Syntax OK` response) and rebooted the instance.
 
-### 5.2 Website configuration
+### 5.b: Domain acquisition and configuration
 
-I had some exposure to front-end development in the past, which allowed me create this introductory page with some decent design. The file created was `/var/www/lizferlinux/index.html`, added as placeholder page while I'm still learning PHP to create something better :) 
+This step may differ depending on the administrator. 
+
+First, I acquired the [lizfer.com](http://lizfer.com) domain on [Google Domains](http://domains.google.com) ("Why?" you ask. "Billing" is the answer) and set it to route to Digital Ocean's domains:
+
+![image](https://user-images.githubusercontent.com/22382891/132896021-4408c902-1109-43de-b34d-2fc050d0ce88.png)
+
+Then, I told Digital Ocean that whenever a request to lizfer.com arrives to their DNS, they should associate it with my instance. I could have done this directly on Google Domains, but doing it this way ensures that I can connect to my cloud Digital Ocean VPC and assess all of its benefits. This was executed by clicking **Create** > **Domains/DNS**.
+
+![image](https://user-images.githubusercontent.com/22382891/132896508-3874f50f-bd7a-44fc-bd93-00547a5020f0.png)
+
+![image](https://user-images.githubusercontent.com/22382891/132896362-4906edb4-40a2-4f62-aa46-f13c6d80e7a7.png)
+
+### 5.c: CA configuration
+
+This process was added because WordPress deals with personal data, which requires some TLS/SSL security. For the Certificate Authority, I chose [Let's Encrypt](https://letsencrypt.org/) because it automatizes most processes with Certbot and it easily integrates with Apache. A few more sub-steps:
+
+- Installed the `certbot` and `python3-certbot-apache` (integration between Apache and Certbot) packages: `sudo apt install certbot python3-certbot-apache`;
+- Used the Apache plugin for Certbot to set up authentication and installation: `sudo certbot --apache` 
+
+Then, up to configuring Wordpress! 🚀
 
 
 ## Thanks
