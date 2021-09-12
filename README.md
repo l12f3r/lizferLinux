@@ -60,6 +60,8 @@ To configure the TLS/SSL certificate for Wordpress, I allowed communication in p
 
 It might look scary at first, but setting up a database was not that difficult due to Ubuntu's configuration.
 
+### 3.a: Download and configuration
+
 Just had to use `sudo apt install mysql-server` to start downloading. Once completed, I ran `sudo mysql_secure_installation` to configure it using MySQL's security script:
 - For the `VALIDATE PASSWORD PLUGIN`, I set a MySQL root password with `STRONG` length (security should always be strong, IMHO);
 - Disabled root account access from a remote client (outside of the local host);
@@ -68,10 +70,20 @@ Just had to use `sudo apt install mysql-server` to start downloading. Once compl
 
 Setting up a MySQL root password was extremely cautious, since that the default authentication method for root is using a unix_socket. 
 
+### 3.b Creating user and database for Wordpress
+
+Wordpress saves information on a database to manage the website and information. I created a new database and user for security reasons (the same ones why I created the PID 1000 user).
+
+- First, I entered as root using `mysql -u root -p`;
+- Created the `wordpress` database using `CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;`;
+- Created the `lizfer` user with `CREATE USER 'lizfer'@'%' IDENTIFIED WITH mysql_native_password BY 'psswd';` (`'psswd'` is not the real password, obviously);
+- Granted full access on `wordpress` to `lizfer`: `GRANT ALL ON wordpress.* TO 'lizfer'@'%';` and updated MySQL's privileges using `FLUSH PRIVILEGES`.
 
 ## 4. PHP
 
-PHP installation by itself is not enough: I also installed `php-mysql` (module that allows PHP to communicate with MySQL) and `libapache2-mod-php` (to enable Apache to handle PHP files). Just entered `sudo apt install php php-mysql libapache2-mod-php`.
+PHP installation by itself is not enough: I also installed several other packages, such as `php-mysql` (module that allows PHP to communicate with MySQL) and `libapache2-mod-php` (to enable Apache to handle PHP files), for example:
+
+`sudo apt install php php-mysql libapache2-mod-php php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip`.
 
 At this point, the LAMP stack was already installed and I had a production instance working.
 
@@ -96,6 +108,13 @@ Then, I created a new configuration file under Apache structure using Nano: `sud
     DocumentRoot /var/www/lizfer
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
+RewriteEngine on
+RewriteCond %{SERVER_NAME} =www.lizfer.com [OR]
+RewriteCond %{SERVER_NAME} =lizfer
+RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+<Directory /var/www/lizfer/>
+    AllowOverride All
+</Directory>    
 </VirtualHost>
 ```
 
