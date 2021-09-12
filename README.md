@@ -70,7 +70,7 @@ Just had to use `sudo apt install mysql-server` to start downloading. Once compl
 
 Setting up a MySQL root password was extremely cautious, since that the default authentication method for root is using a unix_socket. 
 
-### 3.b Creating user and database for Wordpress
+### 3.b: Creating user and database for Wordpress
 
 Wordpress saves information on a database to manage the website and information. I created a new database and user for security reasons (the same ones why I created the PID 1000 user).
 
@@ -78,6 +78,7 @@ Wordpress saves information on a database to manage the website and information.
 - Created the `wordpress` database using `CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;`;
 - Created the `lizfer` user with `CREATE USER 'lizfer'@'%' IDENTIFIED WITH mysql_native_password BY 'psswd';` (`'psswd'` is not the real password, obviously);
 - Granted full access on `wordpress` to `lizfer`: `GRANT ALL ON wordpress.* TO 'lizfer'@'%';` and updated MySQL's privileges using `FLUSH PRIVILEGES`.
+
 
 ## 4. PHP
 
@@ -134,6 +135,30 @@ This process was added because WordPress deals with personal data, which require
 - Used the Apache plugin for Certbot to set up authentication and installation: `sudo certbot --apache` 
 
 Then, up to configuring Wordpress! 🚀
+
+
+## 6. Wordpress
+
+### 6.a: Download and extraction
+
+As a good practice, the latest Wordpress version should be downloaded straight from their website using `curl`.
+
+- First: moved to a writable, temporary directory: `cd /tmp`
+- Downloaded using `curl -O https://wordpress.org/latest.tar.gz`;
+- Extracted the file using `tar xzvf latest.tar.gz`;
+- Created a dummy .htaccess file for Wordpress: `touch /tmp/wordpress/.htaccess` and copied the sample config file for the Wordpress to read: `cp /tmp/wordpress/wp-config-sample.php /tmp/wordpress/wp-config.php`;
+- Avoided future Wordpress permission issues upon updating by creating an upgrade directory: `mkdir /tmp/wordpress/wp-content/upgrade`;
+- Copied the whole content of the directory to Apache's directory: `sudo cp -a /tmp/wordpress/. /var/www/lizfer/`;
+- Granted ownership to www-data (user and group) on Apache's directory: `sudo chown -R www-data:www-data /var/www/lizfer`;
+- Set proper permissions on Wordpress folders using `find`: `sudo find /var/www/lizfer/ -type d -exec chmod 750 {} \;` and 
+`sudo find /var/www/lizfer/ -type f -exec chmod 640 {} \;`.
+
+### 6.b: Security
+
+Upon configuring, Wordpress requires to adjust some secret keys:
+
+- Obtained random values from Wordpress' secret key generator using `curl -s https://api.wordpress.org/secret-key/1.1/salt/`;
+- Entered the proper values on Wordpress' config file using nano: `sudo nano /var/www/lizfer/wp-config.php`.
 
 
 ## Thanks
