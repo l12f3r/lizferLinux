@@ -87,31 +87,25 @@ This chapter is reserved for configuration that must be applied before installin
 The default `/var/www/html` directory remained as backup for the original files; I created a new folder under `www` (`sudo mkdir /var/www/lizfer`) and assigned its ownership to the PID 1000 user (`sudo chown -R $USER:$USER /var/www/lizfer`).
 
 Then, I created a new configuration file under Apache structure using Nano: `sudo nano /etc/apache2/sites-available/lizfer.conf` and included the following content in it:
+
 ```
 <VirtualHost *:80>
     ServerName lizfer
-    ServerAlias www.lizfer
+    ServerAlias www.lizfer.com
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/lizfer
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
+
 I used `sudo a2ensite lizfer` to instruct Apache which is the current active server, and disabled the default website using `sudo a2dissite 000-default`. Ran the final configuration test with `sudo apache2ctl configtest` (with a `Syntax OK` response) and rebooted the instance.
 
 ### 5.b: Domain acquisition and configuration
 
-This step may differ depending on the administrator. 
+I acquired the [lizfer.com](http://lizfer.com) domain on [Google Domains](http://domains.google.com) ("Why?" you ask. "Billing" is the answer) and set it to route to my droplet's IP address:
 
-First, I acquired the [lizfer.com](http://lizfer.com) domain on [Google Domains](http://domains.google.com) ("Why?" you ask. "Billing" is the answer) and set it to route to Digital Ocean's domains:
-
-![image](https://user-images.githubusercontent.com/22382891/132896021-4408c902-1109-43de-b34d-2fc050d0ce88.png)
-
-Then, I told Digital Ocean that whenever a request to lizfer.com arrives to their DNS, they should associate it with my instance. I could have done this directly on Google Domains, but doing it this way ensures that I can connect to my cloud Digital Ocean VPC and assess all of its benefits. This was executed by clicking **Create** > **Domains/DNS**.
-
-![image](https://user-images.githubusercontent.com/22382891/132896508-3874f50f-bd7a-44fc-bd93-00547a5020f0.png)
-
-![image](https://user-images.githubusercontent.com/22382891/132896362-4906edb4-40a2-4f62-aa46-f13c6d80e7a7.png)
+![image](https://user-images.githubusercontent.com/22382891/132994949-66f7c648-4a82-4759-93ac-622c7ea85c84.png)
 
 ### 5.c: CA configuration
 
