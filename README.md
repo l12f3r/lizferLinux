@@ -1,5 +1,5 @@
 # lizferLinux
-Provisioning of a Wordpress website implementation on cloud based on a server with LAMP (Linux 🐧, Apache2 🖌️, MySQL 🐬 and PHP 🐘). Check it at http://188.166.90.196 / http://lizfer.com.
+Provisioning of a Wordpress website implementation on cloud based on a server with LAMP (Linux 🐧, Apache2 🖌️, MySQL 🐬 and PHP 🐘). Check it at http://188.166.90.196 / http://www.lizfer.com.
 
 I decided to create a personal space where I could demonstrate my Linux system administration skills. The prerrogative was:
 - This space needs to be operational anytime, anywhere (availability); and
@@ -101,7 +101,7 @@ The default `/var/www/html` directory remained as backup for the original files;
 
 Then, I created a new configuration file under Apache structure using Nano: `sudo nano /etc/apache2/sites-available/lizfer.conf` and included the following content in it:
 
-```
+```bash
 <VirtualHost *:80>
     ServerName lizfer
     ServerAlias www.lizfer.com
@@ -151,14 +151,63 @@ As a good practice, the latest Wordpress version should be downloaded straight f
 - Copied the whole content of the directory to Apache's directory: `sudo cp -a /tmp/wordpress/. /var/www/lizfer/`;
 - Granted ownership to www-data (user and group) on Apache's directory: `sudo chown -R www-data:www-data /var/www/lizfer`;
 - Set proper permissions on Wordpress folders using `find`: `sudo find /var/www/lizfer/ -type d -exec chmod 750 {} \;` and 
-`sudo find /var/www/lizfer/ -type f -exec chmod 640 {} \;`.
+`sudo find /var/www/lizfer/ -type f -exec chmod 640 {} \;`;
+- Removed the **index.html** file from the Wordpress directory (Wordpress prioritizes HTML files, but we'll use PHP): `sudo rm /var/www/lizfer/index.html`.
 
 ### 6.b: Security
 
 Upon configuring, Wordpress requires to adjust some secret keys:
 
 - Obtained random values from Wordpress' secret key generator using `curl -s https://api.wordpress.org/secret-key/1.1/salt/`;
-- Entered the proper values on Wordpress' config file using nano: `sudo nano /var/www/lizfer/wp-config.php`.
+- Entered the proper values on Wordpress' config file using nano: `sudo nano /var/www/lizfer/wp-config.php`, together with defining other settings (database name, username and password);
+- Defined the filesystem writing method (`FS_METHOD`) to `direct`, on the bottom of this very same file, to avoid prompting for FTP credentials when posting or querying for a blog entry (for example):
+```php
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'wordpress' );
+
+/** MySQL database username */
+define( 'DB_USER', 'lizfer' );
+
+/** MySQL database password */
+define( 'DB_PASSWORD', 'psswd' );
+
+... 
+
+/** Pretend this is the end of the file, OK? */
+define('FS_METHOD', 'direct');
+```
+- Enabled `.htaccess` overrides by editing `sudo nano /etc/apache2/sites-available/lizfer-le-ssl.conf` (to include the SSL exceptions):
+```bash
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+    ServerName lizfer
+    ServerAlias www.lizfer.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/lizfer
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+SSLCertificateFile /etc/letsencrypt/live/www.lizfer.com/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/www.lizfer.com/privkey.pem
+Include /etc/letsencrypt/options-ssl-apache.conf
+<Directory /var/www/lizfer/>
+    AllowOverride All
+</Directory>
+</VirtualHost>
+</IfModule>
+```
+
+### 6.c Final configuration on the web interface
+
+Since that the **index.html** file was deleted, Wordpress switched to load **index.php** - I had to enter https://www.lizfer.com to configure it on the web interface.
+
+After selecting the language, the five-minutes-express installation page was prompted. I chose a username, created another password and completed the installation.
+
+![image](https://user-images.githubusercontent.com/22382891/133316472-6ca9619e-0ee5-45b5-b0ee-d60d54d6fa9e.png)
+(*Tweaks will be added with time.*)
+
+Voilá!
 
 
 ## Thanks
